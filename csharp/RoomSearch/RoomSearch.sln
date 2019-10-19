@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29326.143
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomSearch", "RoomSearch\RoomSearch.csproj", "{D52412A4-10C5-4E53-B7C5-5A99884FAE67}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D52412A4-10C5-4E53-B7C5-5A99884FAE67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D52412A4-10C5-4E53-B7C5-5A99884FAE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D52412A4-10C5-4E53-B7C5-5A99884FAE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D52412A4-10C5-4E53-B7C5-5A99884FAE67}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4C787A6B-5C75-4C56-B6AB-B779C7908CB1}
+	EndGlobalSection
+EndGlobal

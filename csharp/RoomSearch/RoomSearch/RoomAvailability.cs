@@ -1,0 +1,90 @@
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Threading;
+
+namespace RoomSearch
+{
+    public static class RoomAvailability
+    {
+        [FunctionName("PerformSearch")]
+        public static IActionResult PerformSearch(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "room")] HttpRequest req,
+            ILogger log)
+        {
+
+
+            var startDate = DateTime.Parse(req.Query["startDate"]);
+            var endDate = DateTime.Parse(req.Query["endDate"]);
+            log.LogInformation("Searching for room booking in range {startDate} to {endDate}.", startDate, endDate);
+            return new JsonResult(Database.FindEmptyRoom(startDate, endDate));
+
+        }
+
+        [FunctionName("ReserveRoom")]
+        public static async Task<IActionResult> ReserveRoom([HttpTrigger(AuthorizationLevel.Function, "post", Route = "room/{roomId}")]
+            Booking booking,
+            string roomId,
+            [OrchestrationClient]DurableOrchestrationClient starter,
+            [Queue("RoomReserved")]ICollector<string> billingMessages,
+            ILogger log)
+        {
+            var bookingId = Database.AddBooking(roomId, booking);
+            log.LogInformation("Room reserved");
+            var instanceId = await starter.StartNewAsync("BookingSaga", bookingId);
+
+            //raise event
+            billingMessages.Add(instanceId);
+            return new OkResult();
+        }
+
+        [FunctionName("BookingSaga")]
+        public static async Task BookingSaga([OrchestrationTrigger] DurableOrchestrationContext context,
+            [Queue("TimeoutRoomBooking")]ICollector<string> billingMessages,
+            ILogger log)
+        {
+            var bookingId = context.GetInput<string>();
+            using (var cancellationSource = new CancellationTokenSource())
+            {
+                var timer = context.CreateTimer(context.CurrentUtcDateTime.AddSeconds(10), cancellationSource.Token);
+                var completion = context.WaitForExternalEvent("ROOM_BOOKED");
+                var completed = await Task.WhenAny(completion, timer);
+                if (completed == completion)
+                {
+                    log.LogInformation("Room booked for {bookingId} so automatic cancellation canceled", bookingId);
+                    cancellationSource.Cancel();
+                }
+                else
+                {
+                    log.LogInformation("No payment details received so releasing {bookingId}", bookingId);
+                    billingMessages.Add(bookingId);
+                }
+            }
+        }
+
+
+        [FunctionName("BookRoom")]
+        public static async Task BookRoom([QueueTrigger("PaymentReceived")]string instanceId, [OrchestrationClient]DurableOrchestrationClient starter,
+            ILogger log)
+        {
+            //cancel timeout
+            log.LogInformation("Timing out room booking {bookingId}", instanceId);
+            await starter.RaiseEventAsync(instanceId, "ROOM_BOOKED");
+        }
+
+        [FunctionName("Timeout")]
+        public static void Timeout([QueueTrigger("TimeoutRoomBooking")]string bookingId,
+            ILogger log)
+        {
+            log.LogInformation("Timing out room booking {bookingId}", bookingId);
+            Database.CancelBooking(bookingId);
+        }
+    }
+}

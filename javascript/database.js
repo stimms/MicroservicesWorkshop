@@ -18,6 +18,7 @@ var rooms = [
 
 function addBooking(roomId, booking){
     rooms.find(x=>x.id == roomId).bookings.push(booking);
+    return "a booking id";
 };
 
 function cancelBooking(bookingId){

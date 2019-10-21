@@ -15,10 +15,10 @@ namespace RoomSearch
             ILogger log)
         {
             log.LogInformation("Room {bookingId} submitted for charge", bookingId);
+            //50% chance we'll send a message
             if(_random.NextDouble() > .5)
             {
-                //success
-                messages.Add(bookingId);
+                //add a message to the queue
             }
 
         }

@@ -37,10 +37,7 @@ namespace RoomSearch
         {
             var bookingId = Database.AddBooking(roomId, booking);
             log.LogInformation("Room reserved");
-            var instanceId = await starter.StartNewAsync("BookingSaga", bookingId);
 
-            //raise event
-            billingMessages.Add(instanceId);
             return new OkResult();
         }
 
@@ -52,38 +49,25 @@ namespace RoomSearch
             var bookingId = context.GetInput<string>();
             using (var cancellationSource = new CancellationTokenSource())
             {
-                var timer = context.CreateTimer(context.CurrentUtcDateTime.AddSeconds(10), cancellationSource.Token);
-                var completion = context.WaitForExternalEvent("ROOM_BOOKED");
-                var completed = await Task.WhenAny(completion, timer);
-                if (completed == completion)
-                {
-                    log.LogInformation("Room booked for {bookingId} so automatic cancellation canceled", bookingId);
-                    cancellationSource.Cancel();
-                }
-                else
-                {
-                    log.LogInformation("No payment details received so releasing {bookingId}", bookingId);
-                    billingMessages.Add(bookingId);
-                }
+
             }
         }
-
-
-        [FunctionName("BookRoom")]
-        public static async Task BookRoom([QueueTrigger("PaymentReceived")]string instanceId, [OrchestrationClient]DurableOrchestrationClient starter,
-            ILogger log)
-        {
-            //cancel timeout
-            log.LogInformation("Booking room with booking id {bookingId}", instanceId);
-            await starter.RaiseEventAsync(instanceId, "ROOM_BOOKED");
-        }
-
-        [FunctionName("Timeout")]
-        public static void Timeout([QueueTrigger("TimeoutRoomBooking")]string bookingId,
-            ILogger log)
-        {
-            log.LogInformation("Timing out room booking {bookingId}", bookingId);
-            Database.CancelBooking(bookingId);
-        }
     }
+
+
+    [FunctionName("BookRoom")]
+    public static async Task BookRoom([QueueTrigger("PaymentReceived")]string instanceId, [OrchestrationClient]DurableOrchestrationClient starter,
+        ILogger log)
+    {
+        //cancel timeout
+        log.LogInformation("Booking room with booking id {bookingId}", instanceId);
+    }
+
+    [FunctionName("Timeout")]
+    public static void Timeout([QueueTrigger("TimeoutRoomBooking")]string bookingId,
+        ILogger log)
+    {
+        log.LogInformation("Timing out room booking {bookingId}", bookingId);
+    }
+}
 }

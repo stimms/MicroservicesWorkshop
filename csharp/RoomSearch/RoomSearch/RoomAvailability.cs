@@ -20,7 +20,6 @@ namespace RoomSearch
             ILogger log)
         {
 
-
             var startDate = DateTime.Parse(req.Query["startDate"]);
             var endDate = DateTime.Parse(req.Query["endDate"]);
             log.LogInformation("Searching for room booking in range {startDate} to {endDate}.", startDate, endDate);
@@ -75,7 +74,7 @@ namespace RoomSearch
             ILogger log)
         {
             //cancel timeout
-            log.LogInformation("Timing out room booking {bookingId}", instanceId);
+            log.LogInformation("Booking room with booking id {bookingId}", instanceId);
             await starter.RaiseEventAsync(instanceId, "ROOM_BOOKED");
         }
 

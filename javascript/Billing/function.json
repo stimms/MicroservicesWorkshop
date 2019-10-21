@@ -1,0 +1,19 @@
+{
+  "disabled": false,
+  "bindings": [
+    {
+      "name": "bookingId",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "roomreserved",
+      "connection": "AzureWebJobsStorage"
+    },
+    {
+      "type": "queue",
+      "direction": "out",
+      "name": "paymentreceived",
+      "queueName": "paymentreceived",
+      "connection": "AzureWebJobsStorage"
+    }
+  ]
+}

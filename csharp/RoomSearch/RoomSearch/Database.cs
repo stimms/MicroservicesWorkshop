@@ -12,7 +12,7 @@ namespace RoomSearch
         {
             new Room{ Name = "Garden suite"},
             new Room{ Name = "Sea view"},
-            new Room{ Name = "Boom closet"},
+            new Room{ Name = "Broom closet"},
         };
 
         public static IEnumerable<Room> FindEmptyRoom(DateTime startDate, DateTime endDate)

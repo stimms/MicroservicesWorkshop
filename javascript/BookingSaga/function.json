@@ -1,0 +1,17 @@
+{
+  "bindings": [
+    {
+      "name": "context",
+      "type": "orchestrationTrigger",
+      "direction": "in"
+    },
+    {
+      "type": "queue",
+      "direction": "out",
+      "name": "timeoutroombooking",
+      "queueName": "timeoutroombooking",
+      "connection": "AzureWebJobsStorage"
+    }
+  ],
+  "disabled": false
+}

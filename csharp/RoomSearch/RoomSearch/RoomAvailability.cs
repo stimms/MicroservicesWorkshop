@@ -52,22 +52,23 @@ namespace RoomSearch
 
             }
         }
-    }
 
 
-    [FunctionName("BookRoom")]
-    public static async Task BookRoom([QueueTrigger("PaymentReceived")]string instanceId, [OrchestrationClient]DurableOrchestrationClient starter,
-        ILogger log)
-    {
-        //cancel timeout
-        log.LogInformation("Booking room with booking id {bookingId}", instanceId);
-    }
 
-    [FunctionName("Timeout")]
-    public static void Timeout([QueueTrigger("TimeoutRoomBooking")]string bookingId,
-        ILogger log)
-    {
-        log.LogInformation("Timing out room booking {bookingId}", bookingId);
+        [FunctionName("BookRoom")]
+        public static async Task BookRoom([QueueTrigger("PaymentReceived")]string instanceId, [OrchestrationClient]DurableOrchestrationClient starter,
+            ILogger log)
+        {
+            //cancel timeout
+            log.LogInformation("Booking room with booking id {bookingId}", instanceId);
+        }
+
+        [FunctionName("Timeout")]
+        public static void Timeout([QueueTrigger("TimeoutRoomBooking")]string bookingId,
+            ILogger log)
+        {
+            log.LogInformation("Timing out room booking {bookingId}", bookingId);
+        }
     }
 }
-}
+

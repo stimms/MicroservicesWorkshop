@@ -2,11 +2,16 @@
   "disabled": false,
   "bindings": [
     {
-      "name": "myQueueItem",
+      "name": "instanceId",
       "type": "queueTrigger",
       "direction": "in",
       "queueName": "paymentreceived",
       "connection": "AzureWebJobsStorage"
+    },
+    {
+      "name": "starter",
+      "type": "orchestrationClient",
+      "direction": "in"
     }
   ]
 }

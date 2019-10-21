@@ -12,13 +12,22 @@
 const df = require("durable-functions");
 
 module.exports = df.orchestrator(function* (context) {
-    const outputs = [];
-    
-    // Replace "Hello" with the name of your Durable Activity Function.
-    outputs.push(yield context.df.callActivity("Hello", "Tokyo"));
-    outputs.push(yield context.df.callActivity("Hello", "Seattle"));
-    outputs.push(yield context.df.callActivity("Hello", "London"));
+    // get booking id from context
 
-    // returns ["Hello Tokyo!", "Hello Seattle!", "Hello London!"]
-    return outputs;
+    const input = context.df.getInput();
+    // wait for external event ROOM
+
+    let roomBookedPromise = context.df.waitForExternalEvent("ROOM_BOOKED");
+    // create a timer for 10 seconds
+
+    let timeoutPromise = context.df.createTimer(new Date(context.df.currentUtcDateTime.setSeconds(context.df.currentUtcDateTime.getSeconds() + 10)));
+    // either cancel reservation or upgrade reservation
+
+    const winner = yield context.df.Task.any([roomBookedPromise, timeoutPromise]);
+    if (winner == roomBookedPromise) {
+        timeoutPromise.cancel();
+    } else {
+        context.bindings.timeoutroombooking = [input];
+    }
+    context.done();
 });

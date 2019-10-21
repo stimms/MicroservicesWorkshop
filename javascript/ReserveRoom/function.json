@@ -18,8 +18,14 @@
     {
       "type": "queue",
       "direction": "out",
-      "name": "RoomReserved",
-      "queueName": "outQueue"
+      "name": "roomreserved",
+      "queueName": "roomreserved",
+      "connection": "AzureWebJobsStorage"
+    },
+    {
+      "name": "starter",
+      "type": "orchestrationClient",
+      "direction": "in"
     }
   ]
 }

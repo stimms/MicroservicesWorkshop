@@ -1,3 +1,4 @@
+const uuidv1 = require('uuid/v1');
 var rooms = [
     {
         id: "b3eeac1f-a473-41b3-a648-e4dba0b2d96e",
@@ -17,12 +18,13 @@ var rooms = [
 ];
 
 function addBooking(roomId, booking){
+    booking.id = uuidv1();
     rooms.find(x=>x.id == roomId).bookings.push(booking);
-    return "a booking id";
+    return booking.id;
 };
 
 function cancelBooking(bookingId){
-    let room = rooms.find(x=>x.bookings.find(bookingId).length > 0);
+    let room = rooms.find(x=>x.bookings.filter(y=> y.id == bookingId).length > 0)
     room.bookings = room.bookings.filter(x=>x.id !== bookingId);
 }
 
